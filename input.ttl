@@ -1,0 +1,146 @@
+@prefix prot: <http://www.w3.org/2013/02/ValueSet/prot#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix LOINC: <http://www.w3.org/2013/02/ValueSet/LOINC#> .
+@prefix pharma1: <http://www.w3.org/2013/02/ValueSet/pharma1#> .
+@prefix pharma2: <http://www.w3.org/2013/02/ValueSet/pharma2#> .
+@prefix terminology1: <http://www.w3.org/2013/02/ValueSet/terminology1#> .
+@prefix terminology2: <http://www.w3.org/2013/02/ValueSet/terminology2#> .
+
+#################################################################
+# Value Sets
+#################################################################
+
+pharma1:valueSet1234 owl:oneOf (
+  terminology1:1Plus  terminology1:2Plus
+  terminology1:3Plus  terminology1:4Plus ) .
+pharma2:valueSetPick owl:oneOf (
+  terminology2:not_checked  terminology2:WNL  terminology2:absent
+  terminology1:1Plus  terminology1:2Plus  terminology1:3Plus
+  terminology1:4Plus ) .
+pharma2:valueSetBoth owl:oneOf (
+  terminology2:not_checked  terminology2:WNL  terminology2:absent
+  terminology1:1Plus  terminology1:2Plus  terminology1:3Plus
+  terminology1:4Plus  terminology2:slight  terminology2:moderate
+  terminology2:severe  terminology2:very_severe ) .
+
+
+#################################################################
+# Questions
+#################################################################
+
+pharma1:Q_Extol rdfs:label "Exercise tolerance"  ;
+  rdfs:subClassOf prot:CRFQuestion , LOINC:pulmonary_functon_testing ,
+     [ owl:onProperty prot:obsValue ; owl:allValuesFrom pharma1:valueSet1234 ] .
+pharma2:Q_Tread rdfs:label "Treadmill endurance" ;
+  rdfs:subClassOf prot:CRFQuestion , LOINC:cardiac_function_testing ,
+     [ owl:onProperty prot:obsValue ; owl:allValuesFrom pharma2:valueSetPick ] .
+pharma2:Q_Sleep rdfs:label "Sleep disturbance"   ;
+  rdfs:subClassOf prot:CRFQuestion , LOINC:interruption_of_REM_sleep ,
+     [ owl:onProperty prot:obsValue ; owl:allValuesFrom pharma2:valueSetBoth ] .
+
+LOINC:pulmonary_functon_testing rdfs:subClassOf LOINC:exercise_evaluation .
+LOINC:cardiac_function_testing rdfs:subClassOf LOINC:exercise_evaluation .
+
+
+#################################################################
+# CRFs
+#################################################################
+
+pharma1:study1 a prot:Study ;
+    prot:version 1.0 ; # like MetaDataVersion@Name
+    prot:crfs ( pharma1:crf1 pharma1:crf2 ) . # like ItemGroupDefs
+pharma1:crf1 a prot:CRF ;
+    prot:questionSet ( pharma1:initial pharma1:Q_Extol_set1 pharma1:follow ).
+pharma1:Q_Extol_set1 a prot:TimeSequence ;
+    prot:question pharma1:Q_Extol ;
+    prot:atMinuteOffsets 1, 5, 15, 60 .
+
+
+#################################################################
+# Instantiations
+#################################################################
+
+pharma1:study1_crf1_Q_extol_t1 a pharma1:Q_Extol ;
+    prot:obsValue terminology2:WNL .
+pharma2:studyA_crf5_Q_tread_t1 a pharma2:Q_Tread ;
+    prot:obsValue terminology1:2Plus .
+pharma2:studyB_crf3_Q_sleep_t4 a pharma2:Q_Sleep ;
+    prot:obsValue terminology1:3Plus .
+
+
+#################################################################
+# Ontolological Statements
+#################################################################
+
+prot:obsValue a owl:ObjectProperty .
+# prot:question a owl:ObjectProperty .
+prot:CRFQuestion rdfs:subClassOf [ owl:onProperty prot:obsValue ; owl:cardinality 1 ] .
+
+#<http://www.w3.org/2013/02/ValueSet/prot> a owl:Ontology .
+#pharma1:ExerciseTolerance a owl:Class .
+#pharma1:valueSet1234 a owl:Class .
+#
+#prot:CRF a owl:Class .
+#prot:CRFQuestion a owl:Class .
+#pharma1:bar a owl:NamedIndividual .
+#pharma1:foo a owl:NamedIndividual .
+#pharma2:baz a owl:NamedIndividual .
+#terminology1:1Plus a owl:NamedIndividual .
+#terminology1:2Plus a owl:NamedIndividual .
+#terminology1:3Plus a owl:NamedIndividual .
+#terminology1:4Plus a owl:NamedIndividual .
+#terminology2:WNL a owl:NamedIndividual .
+#terminology2:absent a owl:NamedIndividual .
+#terminology2:moderate a owl:NamedIndividual .
+#terminology2:not_checked a owl:NamedIndividual .
+#terminology2:severe a owl:NamedIndividual .
+#terminology2:slight a owl:NamedIndividual .
+#terminology2:very_severe a owl:NamedIndividual .
+[ a owl:AllDifferent ;
+  owl:distinctMembers ( terminology1:1Plus
+                        terminology1:2Plus
+                        terminology1:3Plus
+                        terminology1:4Plus
+                        terminology2:WNL
+                        terminology2:absent
+                        terminology2:moderate
+                        terminology2:not_checked
+                        terminology2:severe
+                        terminology2:slight
+                        terminology2:very_severe
+#                        pharma1:bar
+#                        pharma1:crf1
+#                        pharma1:Q_Extol
+#                        pharma1:foo
+#                        pharma2:baz
+#                        pharma2:crf2
+#                        pharma2:crf3
+#                        pharma2:Q_Sleep
+#                        pharma2:Q_Tread
+                      )
+] .
+
+
+# PREFIX : <http://www.w3.org/2013/02/ValueSet/prot#>
+# PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+# PREFIX LOINC: <http://www.w3.org/2013/02/ValueSet/LOINC#>
+# SELECT ?t ?val {
+#   ?t :obsValue ?val ;
+#      a [ rdfs:subClassOf [ rdfs:subClassOf LOINC:exercise_evaluation ] ]
+# }
+# ┌────────────────────────────────┬────────────────────┐
+# │ ?t                             │ ?val               │
+# │ pharma1:study1_crf1_Q_extol_t1 │ terminology1:1Plus │
+# │ pharma2:studyA_crf5_Q_tread_t1 │ terminology1:2Plus │
+# └────────────────────────────────┴────────────────────┘
+
+# or, letting the reasoner do some work for us:
+
+# SELECT * {
+#   ?test a LOINC:exercise_evaluation ; prot:obsValue ?val .
+# }
+
